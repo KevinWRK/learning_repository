@@ -69,4 +69,11 @@ mapToInt((x) -> x).summaryStatistics()//将集合中的的数字全部转换成�
 先按大于等于当前时间升序，再按小于当前时间降序:
 SELECT * FROM test1 ORDER BY date_time < NOW(), IF(date_time < NOW(), 0, date_time), date_time DESC	
 
-——mysql一对多查询如果分页跟在语句末，则会将查询到的一对多语句进行分页，而在注入实体类时有可能会将2条或多条的一对多查询结果注入一个实体里，造成最终得到的totol和实体不正确，
+——mysql一对多查询如果分页跟在语句末，则会将查询到的一对多语句进行分页，而在注入实体类时有可能会将2条或多条的一对多查询结果注入一个实体里，造成最终得到的totol和实体不正确
+解决方法：   select o.*,g.*
+            from  hs_inquiry_goods as g
+            right JOIN (
+            SELECT * from hs_inquiry_order
+            LIMIT 0,20
+            )o ON o.id = g.inquiry_id
+其中o为主表,先将o表进行分页，再连接上g表的数据，这样获取到的一对多查询结果在注入到实体类时就是正确的
