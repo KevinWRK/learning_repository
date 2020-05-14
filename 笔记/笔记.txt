@@ -77,3 +77,4 @@ SELECT * FROM test1 ORDER BY date_time < NOW(), IF(date_time < NOW(), 0, date_ti
             LIMIT 0,20
             )o ON o.id = g.inquiry_id
 其中o为主表,先将o表进行分页，再连接上g表的数据，这样获取到的一对多查询结果在注入到实体类时就是正确的
+注意：上面的查询语句在排序，必须在内查询语句和外查询语句都加上排序，不然会错乱，已测
