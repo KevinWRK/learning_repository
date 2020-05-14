@@ -1,0 +1,72 @@
+——数据库insert执行完后返回新添加的id
+
+——使用@Transactional默认的隔离级别是READ_COMMITTED（读已提交）
+
+——@Transaction("READ_COMMITTED")设置隔离级别
+
+——事务中抛出RunTimeException就可以回滚
+
+——使用后台实体对象去接收前端的实体对象，前后端两个对象的结构必须匹配
+
+——数据库left join 保留左表的全部记录然后连接右表，right join 相反，inner join 内连接取两表交集（join 默认为内连接）
+
+——File类只能用来存放本地文件地址，里面并不能存放文件数据，URL类可以存放远程文件地址
+
+——TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//加上这句话就可以手动回滚事务
+
+——数据库语句末尾加上 limit 1 可以只查询一条数据
+
+——声明BigDecimal 用字符串，如：new BigDecimal("2.2")
+
+——使用LocalDate类来获取当前时间，LocalDate localDate = LocalDate.now();
+
+——手动抛出异常时，在处理异常的catch中，用 Result.error(e.getLocalizedMessage())来将异常信息返回给前端
+
+——redis实现乐观锁
+			//开启锁
+			boolean flag = false;
+            //乐观锁判断
+            do {
+                log.info("尝试添加redis锁，key值为："+ key);
+                flag = stringRedisTemplate.opsForValue().setIfAbsent(key, Thread.currentThread().getName());
+            }while(!flag);
+			//释放锁
+            stringRedisTemplate.delete(key);
+——数据库函数	ifnull(select id from user,"0") as id	如果前者查询为空，则默认把后者赋值给id
+
+——数据库函数	select name,group_concat(id) from tt2 group by name;	将查询到的name显示其所有相对应所有id
+
+——Spring切面编程记录日志，类上加上@Component和@Aspect注解，再配置切点@Pointcut("@annotation(com.hs.common)")，在@Arpund()注解的方法下添加日志
+
+——将对象集合转换为字符串集合：List<String> list = hsOrders.stream().map(HsOrder::getId).collect(Collectors.toList());
+
+——数据库in语句里面使用子语句查询的结果：
+select sum(price) from hs_reconciliation_app where order_id IN (select id from hs_order where user_id = 1250601293628334081)
+
+——写接口流程：1，整理业务逻辑，传哪些字段，用到哪些表。2，非空判断。3，如果有多个修改语句则加上事务回滚
+
+——判断是否为数字（整数和小数）的正则：^(\-|\+)?\d+(\.\d+)?$
+		Pattern pattern = Pattern.compile("^(\\-|\\+)?\\d+(\\.\\d+)?$");
+        Matcher isNum = pattern.matcher("0.1214141241");
+        System.out.println(isNum.matches());
+
+——lambda 表达式常用的方法
+forEach(n -> System.out.println(n))//遍历并打印集合中的元素
+names.stream()//将集合转换成流
+names.parallelStream()//将集合装换成并行流（多线程处理集合）
+filter((name) -> (condition.test(name)))//判断元素是否符合条件
+conditionA.and(conditionB)//将两个条件拼合类似的还有 or()
+map((name) -> name+"aaa")//将集合中的所有元素添加aaa
+reduce((sum,cost) -> sum +cost).get()//将集合中的数值求合
+collect(Collectors.toList())//生成一个新的集合
+collect(Collectors.joining(", "))//将集合中的每个字符串拼接并已逗号分隔
+distinct().collect(Collectors.toList())//将集合中的元素去重
+mapToInt((x) -> x).summaryStatistics()//将集合中的的数字全部转换成整数，并且进行汇总统计，如最大值，最小值，平均值，总和
+
+匿名内部类里的this为匿名内部类本身，lambda表达式的this为包裹它的类
+
+——mysql自定义排序：select * from hs_order ORDER BY field(reconciliation,3,1,2)
+先按大于等于当前时间升序，再按小于当前时间降序:
+SELECT * FROM test1 ORDER BY date_time < NOW(), IF(date_time < NOW(), 0, date_time), date_time DESC	
+
+——mysql一对多查询如果分页跟在语句末，则会将查询到的一对多语句进行分页，而在注入实体类时有可能会将2条或多条的一对多查询结果注入一个实体里，造成最终得到的totol和实体不正确，
